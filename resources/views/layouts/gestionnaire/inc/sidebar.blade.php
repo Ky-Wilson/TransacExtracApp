@@ -12,9 +12,9 @@
             </a>
         </li>
         <li>
-            <a href="#">
-                <i class='bx bxs-shopping-bag-alt'></i>
-                <span class="text">My Store</span>
+            <a href="{{ route('manager.orange') }}">
+                <i class='bx bxs-upload'></i> <!-- Icône d'upload plus appropriée -->
+                <span class="text">Upload Transactions</span>
             </a>
         </li>
         <li>

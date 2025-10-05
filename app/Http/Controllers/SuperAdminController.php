@@ -43,4 +43,21 @@ class SuperAdminController extends Controller
 
         return view('superadmin.admin.adminList', compact('admins')); // Vue pour les admins
     }
+
+    public function updateAdminStatus(Request $request, $adminId)
+    {
+        $admin = User::findOrFail($adminId);
+        $status = $request->input('status') === '1';
+
+        // Mettre à jour le statut de l'admin
+        $admin->status = $status;
+        $admin->save();
+
+        // Mettre à jour le statut des gestionnaires associés (via company_id ou admin_id)
+        $managers = User::where('role', 'gestionnaire')
+            ->where('company_id', $admin->company_id) // Ou where('admin_id', $admin->id) si utilisé
+            ->update(['status' => $status]);
+
+        return response()->json(['success' => true, 'message' => 'Statut mis à jour avec succès pour l\'admin et ses gestionnaires.']);
+    }
 }

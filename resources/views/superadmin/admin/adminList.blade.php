@@ -25,6 +25,7 @@
                                 <th class="text-center" style="width: 15%; min-width: 120px;">Date de Création</th>
                                 <th class="text-center" style="width: 15%; min-width: 120px;">Statut</th>
                                 <th class="text-center" style="width: 20%; min-width: 160px;">Nombre de Gestionnaires</th>
+                                <th class="text-center" style="width: 15%; min-width: 120px;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,10 +47,15 @@
                                 <td class="text-center">
                                     <p class="m-0">{{ $admin->managers_count }}</p>
                                 </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-success btn-sm edit-status" data-id="{{ $admin->id }}" data-name="{{ $admin->name }}" data-status="{{ $admin->status }}">
+                                        Modifier Statut
+                                    </button>
+                                </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="6" class="text-center py-4">
+                                <td colspan="7" class="text-center py-4">
                                     <p class="text-muted">Aucun admin trouvé.</p>
                                 </td>
                             </tr>
@@ -64,4 +70,70 @@
         </div>
     </div>
 </main>
+
+<!-- Script pour SweetAlert2 -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.edit-status').forEach(button => {
+        button.addEventListener('click', function () {
+            const adminId = this.getAttribute('data-id');
+            const adminName = this.getAttribute('data-name');
+            const currentStatus = this.getAttribute('data-status') === '1';
+
+            Swal.fire({
+                title: `Modifier le statut de ${adminName}`,
+                html: `
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="status" value="1" ${currentStatus ? 'checked' : ''}>
+                        <label class="form-check-label">Actif</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="status" value="0" ${!currentStatus ? 'checked' : ''}>
+                        <label class="form-check-label">Inactif</label>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Enregistrer',
+                cancelButtonText: 'Annuler',
+                preConfirm: () => {
+                    const statusInput = document.querySelector('input[name="status"]:checked');
+                    if (!statusInput) {
+                        Swal.showValidationMessage('Veuillez sélectionner un statut.');
+                        return false;
+                    }
+                    const status = statusInput.value;
+
+                    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                    const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '{{ csrf_token() }}';
+
+                    return fetch(`{{ url('/superadmin/manage-admins') }}/${adminId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ status: status })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erreur lors de la mise à jour');
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Erreur : ${error.message}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('Succès!', 'Le statut a été mis à jour pour l\'admin et ses gestionnaires.', 'success').then(() => {
+                        location.reload();
+                    });
+                }
+            });
+        });
+    });
+});
+</script>
 @endsection
