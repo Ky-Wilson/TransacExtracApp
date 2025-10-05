@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form role="form" class="text-start" method="POST" action="{{ route('register') }}">
+                    <form role="form" class="text-start" method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                         @csrf
                         @if ($errors->any())
                             <div class="alert alert-danger">
@@ -75,6 +75,12 @@
                         <div class="input-group input-group-outline mb-3">
                             <label class="form-label">Confirmer le mot de passe</label>
                             <input type="password" class="form-control" name="password_confirmation" required>
+                        </div>
+
+                        <!-- Champ pour uploader l'avatar -->
+                        <div class="input-group input-group-outline mb-3">
+                            <label class="form-label"></label>
+                            <input type="file" class="form-control" name="avatar" accept="image/*">
                         </div>
 
                         <div class="text-center">

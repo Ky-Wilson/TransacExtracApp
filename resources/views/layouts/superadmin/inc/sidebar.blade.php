@@ -12,17 +12,17 @@
             </a>
         </li>
         <li>
-            <a href="#">
-                <i class='bx bxs-shopping-bag-alt'></i>
-                <span class="text">My Store</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class='bx bxs-doughnut-chart'></i>
-                <span class="text">Analytics</span>
-            </a>
-        </li>
+    <a href="{{ route('superadmin.manage.managers') }}">
+        <i class='bx bxs-user-check'></i> <!-- Icône pour la gestion des gestionnaires -->
+        <span class="text">Liste des gestionnaires</span>
+    </a>
+</li>
+<li>
+    <a href="{{ route('superadmin.manage.admins') }}">
+        <i class='bx bxs-group'></i> <!-- Icône pour la gestion des admins -->
+        <span class="text">Liste des admins</span>
+    </a>
+</li>
         <li>
             <a href="#">
                 <i class='bx bxs-message-dots'></i>
@@ -44,11 +44,35 @@
             </a>
         </li>
         <li>
-            <a href="#" class="logout">
-                <i class='bx bxs-log-out-circle'></i>
-                <span class="text">Logout</span>
-            </a>
+            <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: inline;">
+                @csrf
+                <a href="#" class="logout">
+                    <i class='bx bxs-log-out-circle'></i>
+                    <span class="text">Logout</span>
+                </a>
+            </form>
         </li>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.logout').addEventListener('click', function (event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Déconnexion',
+            text: 'Voulez-vous vraiment vous déconnecter ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui',
+            cancelButtonText: 'Non',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('logout-form').submit();
+            }
+        });
+    });
+});
+        </script>
     </ul>
 </section>
 <!-- SIDEBAR -->

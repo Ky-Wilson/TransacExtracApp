@@ -8,7 +8,9 @@
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 	<!-- My CSS -->
 	<link rel="stylesheet" href="{{ asset('assets/style.css') }}">
-
+<!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>AdminHub</title>
 </head>
 <body>
@@ -32,5 +34,7 @@
 	
 
 	<script src="{{ asset('assets/script.js') }}"></script>
+	<!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 </body>
 </html>

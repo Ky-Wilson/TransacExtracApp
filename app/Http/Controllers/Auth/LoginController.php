@@ -26,7 +26,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/login';
 
     /**
      * Create a new controller instance.
@@ -52,9 +52,9 @@ class LoginController extends Controller
                 'super_admin' => '/superadmin/dashboard',
                 'admin' => '/admin/dashboard',
                 'gestionnaire' => '/gestionnaire/dashboard',
-                default => '/home',
+                default => '/login',
             };
         }
-        return '/home';
+        return '/login';
     }
 }

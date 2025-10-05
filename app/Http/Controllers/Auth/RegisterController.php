@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Companie;
+use App\Models\Company; // Corriger l'utilisation de "Company" au lieu de "Companie"
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Http\Request; // Utiliser Illuminate\Http\Request au lieu de la façade
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -65,6 +66,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'avatar' => ['nullable', 'image', 'max:2048'], // Validation pour une image, max 2MB
         ]);
     }
 
@@ -82,6 +84,15 @@ class RegisterController extends Controller
             'phone' => $data['company_phone'],
         ]);
 
+        $avatarPath = null;
+        if ($data['avatar']) {
+            // Générer un nom unique pour l'image
+            $avatarName = time() . '_' . $data['avatar']->getClientOriginalName();
+            // Déplacer l'image vers public/assets/avatars
+            $data['avatar']->move(public_path('assets/avatars'), $avatarName);
+            $avatarPath = 'assets/avatars/' . $avatarName; // Chemin relatif pour stockage
+        }
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -89,6 +100,7 @@ class RegisterController extends Controller
             'role' => 'admin',
             'status' => true,
             'company_id' => $company->id,
+            'avatar' => $avatarPath ?? 'assets/avatars/default.png', // Chemin par défaut si pas d'image
         ]);
 
         return $user;

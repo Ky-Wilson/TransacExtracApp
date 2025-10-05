@@ -11,16 +11,16 @@
                 <span class="text">Dashboard</span>
             </a>
         </li>
-        <li>
-            <a href="#">
-                <i class='bx bxs-shopping-bag-alt'></i>
-                <span class="text">My Store</span>
+        <li class="nav-item">
+            <a href="{{ route('admin.create.manager.form') }}" class="nav-link">
+                <i class='bx bxs-user-plus'></i>
+                <span class="text">Créer un Gestionnaire</span>
             </a>
         </li>
-        <li>
-            <a href="#">
+        <li class="nav-item">
+            <a href="{{ route('admin.manage.managers') }}" class="nav-link btn btn-primary">
                 <i class='bx bxs-doughnut-chart'></i>
-                <span class="text">Analytics</span>
+                <span class="text">Liste des Gestionnaires</span>
             </a>
         </li>
         <li>
@@ -44,11 +44,35 @@
             </a>
         </li>
         <li>
-            <a href="#" class="logout">
-                <i class='bx bxs-log-out-circle'></i>
-                <span class="text">Logout</span>
-            </a>
+            <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: inline;">
+                @csrf
+                <a href="#" class="logout">
+                    <i class='bx bxs-log-out-circle'></i>
+                    <span class="text">Logout</span>
+                </a>
+            </form>
         </li>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.logout').addEventListener('click', function (event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Déconnexion',
+            text: 'Voulez-vous vraiment vous déconnecter ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui',
+            cancelButtonText: 'Non',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('logout-form').submit();
+            }
+        });
+    });
+});
+        </script>
     </ul>
 </section>
 <!-- SIDEBAR -->
