@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use thiagoalessio\TesseractOCR\TesseractOCR;
-use Illuminate\Support\Facades\Storage;
 use App\Models\TransacOrange;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class ManagerController extends Controller
 {
@@ -16,11 +17,36 @@ class ManagerController extends Controller
         $this->middleware('manager');
     }
 
-    public function dashboard()
-    {
-        return view('gestionnaire.dashboard');
+     public function dashboard()
+{
+    // Fetch transaction counts and totals for the authenticated user
+    $stats = TransacOrange::where('user_id', auth()->id())
+        ->select(
+            'type',
+            DB::raw('COUNT(*) as count'),
+            DB::raw('SUM(CAST(REGEXP_REPLACE(montant, "[^0-9.]", "") AS DECIMAL(15,2))) as total_amount')
+        )
+        ->groupBy('type')
+        ->get()
+        ->keyBy('type');
+
+    // Initialize stats for all types
+    $transactionStats = [
+        'transfere' => ['count' => 0, 'total_amount' => 0],
+        'depot' => ['count' => 0, 'total_amount' => 0],
+        'retrait' => ['count' => 0, 'total_amount' => 0],
+    ];
+
+    // Populate stats - GARDEZ LES VALEURS NUMÉRIQUES
+    foreach ($stats as $type => $stat) {
+        $transactionStats[$type] = [
+            'count' => $stat->count,
+            'total_amount' => $stat->total_amount, // Ne pas formater ici
+        ];
     }
 
+    return view('gestionnaire.dashboard', compact('transactionStats'));
+}
     public function showOrangeForm()
     {
         return view('gestionnaire.orange');
@@ -29,7 +55,7 @@ class ManagerController extends Controller
    public function orange(Request $request)
 {
     $request->validate([
-        'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+        'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
     ]);
 
     try {
@@ -43,7 +69,7 @@ class ManagerController extends Controller
 
         // Nettoyer et normaliser le texte
         $text = preg_replace('/\s+/', ' ', trim($text));
-        $text = strtolower($text); // Convertir en minuscule pour la recherche
+        $text = strtolower($text);
 
         // Extraire les données selon le type de transaction
         $transactionData = $this->extractOrangeTransaction($text);
@@ -52,6 +78,19 @@ class ManagerController extends Controller
         Storage::disk('public')->delete($imagePath);
 
         if ($transactionData['type']) {
+            // Vérifier si une transaction similaire existe (même type, montant et date proche)
+            $existingTransaction = TransacOrange::where('user_id', auth()->id())
+                ->where('type', $transactionData['type'])
+                ->where('montant', $transactionData['montant'])
+                ->where('reference', $transactionData['reference'])
+                ->whereDate('created_at', '>=', now()->subHours(24)) // Dans les dernières 24h
+                ->first();
+
+            if ($existingTransaction) {
+                $request->session()->flash('error', 'Une transaction similaire existe déjà. Type: ' . $transactionData['type'] . ' | Référence: ' . $transactionData['reference'] . ' | Montant: ' . $transactionData['montant']);
+                return redirect()->route('manager.orange.form');
+            }
+
             // Enregistrer dans la table transac_orange
             TransacOrange::create([
                 'user_id' => auth()->id(),
@@ -65,7 +104,6 @@ class ManagerController extends Controller
                 'raw_text' => $text,
             ]);
 
-            // Stocker les données dans la session
             $request->session()->flash('transaction_data', $transactionData);
             $request->session()->flash('success', 'Transaction enregistrée avec succès');
 
@@ -81,7 +119,7 @@ class ManagerController extends Controller
     }
 }
 
-  private function extractOrangeTransaction($text)
+private function extractOrangeTransaction($text)
 {
     $data = [
         'type' => null,
@@ -118,14 +156,35 @@ class ManagerController extends Controller
         $data['expediteur'] = $matches[0];
     }
 
-    // Extraction de la référence selon le type
-    if ($data['type'] === 'transfere' && preg_match('/reference\s+(pp[a-z0-9\.]+(?:\.[a-z0-9]+)*)/i', $text, $matches)) {
-        $data['reference'] = strtoupper($matches[1]);
-    } elseif ($data['type'] === 'depot' && preg_match('/reference\s+(c[i]?[a-z0-9\.]+(?:\.[a-z0-9]+)*)/i', $text, $matches)) {
-        $data['reference'] = strtoupper($matches[1]);
-    } elseif ($data['type'] === 'retrait' && preg_match('/reference\s+(co[a-z0-9\.]+(?:\.[a-z0-9]+)*)/i', $text, $matches)) {
-        $data['reference'] = strtoupper($matches[1]);
+    // ==================================================================
+    // == SECTION CORRIGÉE : EXTRACTION DE LA RÉFÉRENCE ==
+    // ==================================================================
+    
+    $keywordPattern = '(?:reference|référence|ref\.|ref)\s*:?\s*';
+
+    if ($data['type'] === 'transfere') {
+        // Pattern pour transfere: PP suivi de lettres, chiffres, points
+        if (preg_match('/' . $keywordPattern . '(pp[a-z0-9\.]+)/i', $text, $matches) || preg_match('/(pp[a-z0-9\.]{15,})/i', $text, $matches)) {
+            $data['reference'] = strtoupper($matches[1]);
+        }
+    } 
+    // --- CORRECTION POUR DÉPÔT ET RETRAIT ---
+    elseif ($data['type'] === 'depot') {
+        // Pattern flexible: CI/C1/CL suivi de LETTRES, chiffres et points
+        if (preg_match('/' . $keywordPattern . '(c[il1][a-z0-9\.]+)/i', $text, $matches) || preg_match('/(c[il1][a-z0-9\.]{15,})/i', $text, $matches)) {
+            // Remplace C1 ou CL par CI au début de la chaîne pour normaliser
+            $data['reference'] = preg_replace('/^C[L1]/', 'CI', strtoupper($matches[1]));
+        }
+    } elseif ($data['type'] === 'retrait') {
+        // Pattern flexible: CO/C0 suivi de LETTRES, chiffres et points
+        if (preg_match('/' . $keywordPattern . '(c[o0][a-z0-9\.]+)/i', $text, $matches) || preg_match('/(c[o0][a-z0-9\.]{15,})/i', $text, $matches)) {
+            // Remplace C0 par CO au début de la chaîne pour normaliser
+            $data['reference'] = preg_replace('/^C0/', 'CO', strtoupper($matches[1]));
+        }
     }
+    // ==================================================================
+    // == FIN DE LA SECTION CORRIGÉE ==
+    // ==================================================================
 
     // Extraction du solde
     if (preg_match('/(sols?de|nouveau solde|balance?)\s*:?\s*(\d{1,10}(?:\.\d{2})?)\s*(?:fcfa|f)/i', $text, $matches)) {
@@ -139,15 +198,25 @@ class ManagerController extends Controller
 
     // Extraction de la date
     if (preg_match('/(\d{1,2}):(\d{2})\s*(?:pm|am)/i', $text, $matches)) {
-        $data['date'] = date('Y-m-d') . ' ' . $matches[1] . ':' . $matches[2] . ':00'; // Ajoute la date actuelle avec l'heure
+        $data['date'] = date('Y-m-d') . ' ' . $matches[1] . ':' . $matches[2] . ':00';
     } elseif (preg_match('/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})|(\d{4})-(\d{2})-(\d{2})/', $text, $matches)) {
         if (!empty($matches[3])) {
-            $data['date'] = $matches[3] . '-' . $matches[2] . '-' . $matches[1]; // Format Y-m-d
+            $data['date'] = $matches[3] . '-' . $matches[2] . '-' . $matches[1];
         } elseif (!empty($matches[4])) {
-            $data['date'] = $matches[4] . '-' . $matches[5] . '-' . $matches[6]; // Format Y-m-d
+            $data['date'] = $matches[4] . '-' . $matches[5] . '-' . $matches[6];
         }
     }
 
     return $data;
 }
+    public function listOrangeTransactions()
+    {
+        // Fetch transactions for the authenticated user with pagination
+        $transactions = TransacOrange::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10); // Paginate with 10 transactions per page
+
+        // Pass the transactions to the view
+        return view('gestionnaire.orange_transactions', compact('transactions'));
+    }
 }

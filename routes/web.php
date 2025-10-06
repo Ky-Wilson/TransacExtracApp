@@ -37,4 +37,6 @@ Route::middleware(['auth', 'manager'])->group(function () {
     Route::get('/gestionnaire/dashboard', [ManagerController::class, 'dashboard'])->name('gestionnaire.dashboard');
     Route::get('/gestionnaire/orange', [ManagerController::class, 'showOrangeForm'])->name('manager.orange.form'); // Nouvelle route GET pour afficher la vue
     Route::post('/gestionnaire/orange', [ManagerController::class, 'orange'])->name('manager.orange'); // Route POST pour traiter l'upload
+    // New route for listing transactions
+    Route::get('/gestionnaire/orange/transactions', [ManagerController::class, 'listOrangeTransactions'])->name('manager.orange.transactions');
 });

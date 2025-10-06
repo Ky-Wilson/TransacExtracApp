@@ -11,7 +11,7 @@
 <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
-	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<title>Gestionnaire dashboard</title>
 </head>
 <body>
@@ -32,7 +32,9 @@
 		<!-- MAIN -->
 	</section>
 	<!-- CONTENT -->
-	
+	<!-- In resources/views/layouts/admin/master.blade.php -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 	<script src="{{ asset('assets/script.js') }}"></script>
 	<!-- SweetAlert2 JS -->

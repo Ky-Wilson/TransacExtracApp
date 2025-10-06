@@ -17,12 +17,15 @@ class CreateTransacOrangeTable extends Migration
             $table->string('reference')->nullable(); // Référence de la transaction
             $table->string('solde')->nullable(); // Solde restant
             $table->string('frais')->nullable(); // Frais appliqués
-            $table->date('date')->nullable(); // Date de la transaction
+            $table->dateTime('date')->nullable(); // Date et heure de la transaction
             $table->text('raw_text')->nullable(); // Texte brut extrait pour référence
             $table->timestamps();
 
             // Clé étrangère vers la table users
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            // Index pour optimiser la vérification des doublons
+            $table->index(['user_id', 'type', 'reference']);
         });
     }
 
