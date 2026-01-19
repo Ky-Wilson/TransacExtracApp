@@ -1,4 +1,4 @@
-@extends('layouts.gestionnaire.master')
+@extends('layouts.gestionnairev2.master')
 
 @section('content')
 <style>

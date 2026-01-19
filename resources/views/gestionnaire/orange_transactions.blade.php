@@ -1,265 +1,224 @@
-@extends('layouts.gestionnaire.master')
+@extends('layouts.gestionnairev2.master')
 
 @section('content')
-<main>
-    <div class="table-data">
-        <div class="order">
-            @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class='bx bx-check-circle me-2'></i>
+<div class="main-content-inner">
+    <div class="main-content-wrap">
+
+        <!-- Header + Breadcrumbs -->
+        <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <h3>Transactions Orange</h3>
+            <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                <li>
+                    <a href="{{ route('gestionnaire.dashboard') }}">
+                        <div class="text-tiny">Dashboard</div>
+                    </a>
+                </li>
+                <li>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </li>
+                <li>
+                    <div class="text-tiny">Transactions Orange</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Messages -->
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="fa-solid fa-circle-check me-2"></i>
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            @endif
-            @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class='bx bx-error-circle me-2'></i>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
                 {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            @endif
+        @endif
 
-            {{-- <div class="head d-flex justify-content-between align-items-center mb-4">
-                <h3 class="m-0">
-                    <i class='bx bxl-stripe' style='color: #ff6600; font-size: 1.5rem;'></i>
-                    Transactions Orange
-                </h3>
-                <div>
-                    <i class='bx bx-search me-2' style='cursor: pointer; font-size: 1.3rem;'></i>
-                    <i class='bx bx-filter' style='cursor: pointer; font-size: 1.3rem;'></i>
+        <!-- Boîte principale -->
+        <div class="wg-box">
+            <!-- Recherche + Filtres + Bouton PDF -->
+            <div class="flex items-center justify-between gap10 flex-wrap mb-4">
+                <div class="wg-filter flex-grow">
+                    <form class="form-search" method="GET" action="{{ route('manager.orange.transactions') }}">
+                        <fieldset class="name">
+                            <input type="text"
+                                   name="search"
+                                   placeholder="Référence ou numéro expéditeur..."
+                                   value="{{ request('search') }}"
+                                   class="form-control">
+                        </fieldset>
+                        <div class="button-submit">
+                            <button type="submit">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </div> --}}
-            <div class="head d-flex justify-content-between align-items-center mb-4">
-                <h3 class="m-0">
-                    <i class='bx bxl-stripe' style='color: #ff6600; font-size: 1.5rem;'></i>
-                    Transactions Orange
-                </h3>
-                <a href="{{ route('manager.dashboard.pdf') }}" class="btn-download">
-    <i class='bx bxs-cloud-download'></i>
-    <span class="text">Télécharger PDF</span>
-</a>
-                <div>
-                    <i class='bx bx-search me-2' style='cursor: pointer; font-size: 1.3rem;' data-bs-toggle="collapse"
-                        data-bs-target="#filterCollapse"></i>
-                    <i class='bx bx-filter' style='cursor: pointer; font-size: 1.3rem;' data-bs-toggle="collapse"
-                        data-bs-target="#filterCollapse"></i>
+
+                <div class="d-flex gap-2">
+                    <a href="{{ route('manager.dashboard.pdf') }}" class="tf-button style-1">
+                        <i class="fa-solid fa-file-pdf me-2"></i>Télécharger PDF
+                    </a>
+                    <button class="tf-button style-2" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                        <i class="fa-solid fa-filter me-2"></i>Filtres
+                    </button>
                 </div>
             </div>
 
-            <!-- Formulaire de filtres -->
+            <!-- Filtres avancés (collapse) -->
             <div class="collapse mb-4" id="filterCollapse">
                 <form method="GET" action="{{ route('manager.orange.transactions') }}" class="row g-3">
                     <div class="col-md-3">
-                        <label class="form-label">Type</label>
+                        <label class="form-label">Type de transaction</label>
                         <select name="type" class="form-select">
-                            <option value="">Tous</option>
-                            <option value="transfere" {{ request('type')=='transfere' ? 'selected' : '' }}>Transfert
-                            </option>
-                            <option value="depot" {{ request('type')=='depot' ? 'selected' : '' }}>Dépôt</option>
-                            <option value="retrait" {{ request('type')=='retrait' ? 'selected' : '' }}>Retrait</option>
+                            <option value="">Tous les types</option>
+                            <option value="transfere" {{ request('type') == 'transfere' ? 'selected' : '' }}>Transfert</option>
+                            <option value="depot" {{ request('type') == 'depot' ? 'selected' : '' }}>Dépôt</option>
+                            <option value="retrait" {{ request('type') == 'retrait' ? 'selected' : '' }}>Retrait</option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Recherche (réf. ou exp.)</label>
-                        <input type="text" name="search" class="form-control" value="{{ request('search') }}"
-                            placeholder="Référence ou numéro">
-                    </div>
-                    <div class="col-md-2">
                         <label class="form-label">Date dès</label>
                         <input type="date" name="date_from" class="form-control" value="{{ request('date_from') }}">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label class="form-label">Date jusqu'à</label>
                         <input type="date" name="date_to" class="form-control" value="{{ request('date_to') }}">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">Filtrer</button>
-                        <a href="{{ route('manager.orange.transactions') }}" class="btn btn-secondary">Réinitialiser</a>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="tf-button style-1">Appliquer</button>
+                        <a href="{{ route('manager.orange.transactions') }}" class="tf-button style-2">Réinitialiser</a>
                     </div>
                 </form>
             </div>
 
-            <!-- Votre table reste inchangée -->
-
-            <div class="table-responsive">
-                <table class="table table-striped table-hover shadow-sm rounded" style="white-space: nowrap;">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-category me-1'></i>Type
-                            </th>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-money me-1'></i>Montant
-                            </th>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-user me-1'></i>Expéditeur
-                            </th>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-file me-1'></i>Référence
-                            </th>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-wallet me-1'></i>Solde
-                            </th>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-receipt me-1'></i>Frais
-                            </th>
-                            <th class="text-center" style="width: 15%; min-width: 120px;">
-                                <i class='bx bx-calendar me-1'></i>Date
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($transactions as $transaction)
-                        <tr class="align-middle">
-                            <td class="text-center">
-                                @if($transaction->type == 'transfere')
-                                <span class="badge bg-primary">
-                                    <i class='bx bx-transfer'></i> {{ ucfirst($transaction->type) }}
-                                </span>
-                                @elseif($transaction->type == 'depot')
-                                <span class="badge bg-success">
-                                    <i class='bx bx-download'></i> {{ ucfirst($transaction->type) }}
-                                </span>
-                                @elseif($transaction->type == 'retrait')
-                                <span class="badge bg-danger">
-                                    <i class='bx bx-upload'></i> {{ ucfirst($transaction->type) }}
-                                </span>
-                                @else
-                                <span class="badge bg-secondary">
-                                    {{ ucfirst($transaction->type) }}
-                                </span>
-                                @endif
-                            </td>
-                            <td class="text-center fw-bold text-success">
-                                {{ is_numeric($transaction->montant) ? number_format((float)$transaction->montant, 0,
-                                ',', ' ') : $transaction->montant }} FCFA
-                            </td>
-                            <td class="text-center">
-                                @if($transaction->expediteur)
-                                <i class='bx bx-user-circle me-1' style='color: #6c757d;'></i>
-                                {{ $transaction->expediteur }}
-                                @else
-                                <span class="text-muted">N/A</span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                @if($transaction->reference)
-                                <code class="bg-light text-dark px-2 py-1 rounded">
-                                        {{ $transaction->reference }}
-                                    </code>
-                                @else
-                                <span class="text-muted">N/A</span>
-                                @endif
-                            </td>
-                            <td class="text-center fw-bold" style="color: #0d6efd;">
-                                {{ $transaction->solde ? number_format((float)$transaction->solde, 0, ',', ' ') . '
-                                FCFA' : 'N/A' }}
-                            </td>
-                            <td class="text-center text-warning fw-semibold">
-                                {{ $transaction->frais ? number_format((float)$transaction->frais, 0, ',', ' ') . '
-                                FCFA' : 'N/A' }}
-                            </td>
-                            <td class="text-center">
-                                <small class="text-muted">
-                                    <i class='bx bx-time-five me-1'></i>
-                                    {{ \Carbon\Carbon::parse($transaction->date)->format('d-m-Y H:i') }}
-                                </small>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-5">
-                                <i class='bx bx-info-circle' style='font-size: 3rem; color: #6c757d;'></i>
-                                <p class="text-muted mt-3">Aucune transaction trouvée.</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+            <!-- Table des transactions -->
+            <div class="wg-table table-all-user">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">Montant</th>
+                                <th class="text-center">Expéditeur</th>
+                                <th class="text-center">Référence</th>
+                                <th class="text-center">Solde après</th>
+                                <th class="text-center">Frais</th>
+                                <th class="text-center">Date & Heure</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($transactions as $transaction)
+                                <tr>
+                                    <td class="text-center">
+                                        @if($transaction->type == 'transfere')
+                                            <span class="badge bg-primary"><i class="fa-solid fa-arrow-right-arrow-left me-1"></i>Transfert</span>
+                                        @elseif($transaction->type == 'depot')
+                                            <span class="badge bg-success"><i class="fa-solid fa-arrow-down me-1"></i>Dépôt</span>
+                                        @elseif($transaction->type == 'retrait')
+                                            <span class="badge bg-danger"><i class="fa-solid fa-arrow-up me-1"></i>Retrait</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ ucfirst($transaction->type) }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center fw-bold text-success">
+                                        {{ number_format((float)$transaction->montant, 0, ',', ' ') }} FCFA
+                                    </td>
+                                    <td class="text-center">
+                                        {{ $transaction->expediteur ?? '<span class="text-muted">N/A</span>' }}
+                                    </td>
+                                    <td class="text-center">
+                                        <code class="bg-light px-2 py-1 rounded">
+                                            {{ $transaction->reference ?? 'N/A' }}
+                                        </code>
+                                    </td>
+                                    <td class="text-center fw-bold text-primary">
+                                        {{ $transaction->solde ? number_format((float)$transaction->solde, 0, ',', ' ') . ' FCFA' : 'N/A' }}
+                                    </td>
+                                    <td class="text-center text-warning fw-semibold">
+                                        {{ $transaction->frais ? number_format((float)$transaction->frais, 0, ',', ' ') . ' FCFA' : 'N/A' }}
+                                    </td>
+                                    <td class="text-center">
+                                        <small class="text-muted">
+                                            <i class="fa-solid fa-calendar-days me-1"></i>
+                                            {{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y H:i') }}
+                                        </small>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-receipt fa-3x mb-3 opacity-50"></i><br>
+                                        Aucune transaction trouvée pour le moment.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination mt-4">
-                {{ $transactions->links('pagination::bootstrap-5') }}
-            </div>
+            <div class="divider my-4"></div>
 
-            <div class="mt-4">
-                <a href="{{ route('manager.orange.form') }}" class="btn btn-primary">
-                    <i class='bx bx-plus-circle me-2'></i>Ajouter une nouvelle transaction
+            <!-- Pagination + Bouton Ajouter -->
+            <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
+                <div>
+                    {{ $transactions->appends(request()->query())->links('pagination::bootstrap-5') }}
+                </div>
+                <a href="{{ route('manager.orange.form') }}" class="tf-button style-1">
+                    <i class="fa-solid fa-plus me-2"></i>Ajouter transaction
                 </a>
             </div>
         </div>
+
     </div>
-</main>
+</div>
+@endsection
 
-<!-- Styles personnalisés -->
 <style>
-    .table {
-        white-space: nowrap !important;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    .wg-box {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     }
-
-    .table thead th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .tf-button.style-1 {
+        background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
-        font-weight: 600;
         border: none;
-        padding: 1rem;
+        padding: 0.6rem 1.4rem;
+        border-radius: 8px;
     }
-
-    .table tbody tr {
-        transition: all 0.3s ease;
+    .tf-button.style-2 {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
     }
-
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
-        transform: scale(1.01);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
     .badge {
         padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 0.9rem;
     }
-
-    .alert {
-        border-radius: 10px;
-        border-left: 4px solid;
+    .form-search input {
+        height: 46px;
+        border-radius: 8px 0 0 8px;
+        border: 1px solid #e0e0e0;
     }
-
-    .alert-success {
-        border-left-color: #10b981;
-        background-color: #d1fae5;
-        color: #065f46;
+    .form-search .button-submit button {
+        height: 46px;
+        border-radius: 0 8px 8px 0;
+        background: #667eea;
+        border: none;
+        color: white;
+        padding: 0 1.2rem;
     }
-
-    .alert-danger {
-        border-left-color: #ef4444;
-        background-color: #fee2e2;
-        color: #991b1b;
-    }
-
-    code {
-        font-size: 0.875rem;
-        font-family: 'Courier New', monospace;
-    }
-
     @media (max-width: 768px) {
-        .table {
-            display: table !important;
-            width: 100% !important;
-        }
-
-        .table th,
-        .table td {
-            min-width: 120px !important;
-            padding: 0.5rem !important;
-        }
-
-        .table-responsive {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch;
-        }
+        .table-responsive { overflow-x: auto; }
+        .table th, .table td { min-width: 140px; }
     }
 </style>
-@endsection

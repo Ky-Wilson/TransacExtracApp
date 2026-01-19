@@ -1,217 +1,174 @@
-@extends('layouts.admin.master')
+@extends('layouts.adminv2.master')
+
 @section('content')
-
-<style>
-    .form-wrapper {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .form-container {
-        background: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        padding: 40px;
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
-    }
-    
-    .form-container h1 {
-        font-size: 28px;
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 10px;
-        text-align: center;
-    }
-    
-    .form-container .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 30px;
-        font-size: 14px;
-    }
-    
-    .form-group {
-        margin-bottom: 25px;
-    }
-    
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #444;
-        font-size: 14px;
-    }
-    
-    .form-group input {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 15px;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
-    }
-    
-    .form-group input:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-    
-    .btn-submit {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        margin-top: 10px;
-    }
-    
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-submit:active {
-        transform: translateY(0);
-    }
-    
-    .alert {
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin-bottom: 25px;
-        font-size: 14px;
-    }
-    
-    .alert-danger {
-        background-color: #fee;
-        border-left: 4px solid #dc3545;
-        color: #721c24;
-    }
-    
-    .alert-success {
-        background-color: #d4edda;
-        border-left: 4px solid #28a745;
-        color: #155724;
-    }
-    
-    .alert ul {
-        margin: 0;
-        padding-left: 20px;
-    }
-    
-    .alert li {
-        margin: 5px 0;
-    }
-    
-    .back-link {
-        text-align: center;
-        margin-top: 20px;
-    }
-    
-    .back-link a {
-        color: #667eea;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s ease;
-    }
-    
-    .back-link a:hover {
-        color: #764ba2;
-        text-decoration: underline;
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-        .form-container {
-            padding: 30px 25px;
-        }
-        
-        .form-container h1 {
-            font-size: 24px;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .form-wrapper {
-            padding: 15px;
-        }
-        
-        .form-container {
-            padding: 25px 20px;
-        }
-        
-        .form-container h1 {
-            font-size: 22px;
-        }
-        
-        .form-group input {
-            padding: 10px 12px;
-        }
-        
-        .btn-submit {
-            padding: 12px;
-        }
-    }
-</style>
-
-<div class="form-wrapper">
-    <div class="form-container">
-        <h1>Créer un Gestionnaire</h1>
-        <p class="subtitle">Remplissez les informations ci-dessous</p>
-        
-        @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
+<main class="main-content-inner">
+    <div class="main-content-wrap">
+        <!-- Header + Breadcrumbs -->
+        <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <h3>Créer un Gestionnaire</h3>
+            <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                <li>
+                    <a href="{{ route('admin.dashboard') }}">
+                        <div class="text-tiny">Dashboard</div>
+                    </a>
+                </li>
+                <li>
+                    <i class="icon-chevron-right"></i>
+                </li>
+                <li>
+                    <a href="{{ route('admin.manage.managers') }}">
+                        <div class="text-tiny">Gestionnaires</div>
+                    </a>
+                </li>
+                <li>
+                    <i class="icon-chevron-right"></i>
+                </li>
+                <li>
+                    <div class="text-tiny">Nouveau Gestionnaire</div>
+                </li>
             </ul>
         </div>
-        @endif
-        
+
+        <!-- Messages -->
         @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.create.manager') }}">
-            @csrf
-            
-            <div class="form-group">
-                <label for="name">Nom du gestionnaire</label>
-                <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Ex: Jean Dupont" required>
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                <strong>Erreur{{ $errors->count() > 1 ? 's' : '' }} :</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            
-            <div class="form-group">
-                <label for="email">Email du gestionnaire</label>
-                <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="exemple@email.com" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" name="password" id="password" placeholder="Minimum 8 caractères" required>
-            </div>
-            
-            <button type="submit" class="btn-submit">Créer le gestionnaire</button>
-        </form>
-        
-        <div class="back-link">
-            <a href="{{ route('admin.dashboard') ?? '#' }}">← Retour au tableau de bord</a>
+        @endif
+
+        <!-- Formulaire dans wg-box -->
+        <div class="wg-box">
+            <form class="form-new-product form-style-1"
+                  method="POST"
+                  action="{{ route('admin.create.manager') }}"
+                  enctype="multipart/form-data">
+
+                @csrf
+
+                <!-- Nom -->
+                <fieldset class="name">
+                    <div class="body-title">Nom du gestionnaire <span class="tf-color-1">*</span></div>
+                    <input class="flex-grow"
+                           type="text"
+                           name="name"
+                           placeholder="Ex: Jean Dupont"
+                           value="{{ old('name') }}"
+                           tabindex="0"
+                           required>
+                </fieldset>
+
+                <!-- Email -->
+                <fieldset class="name">
+                    <div class="body-title">Adresse email <span class="tf-color-1">*</span></div>
+                    <input class="flex-grow"
+                           type="email"
+                           name="email"
+                           placeholder="exemple@email.com"
+                           value="{{ old('email') }}"
+                           tabindex="0"
+                           required>
+                </fieldset>
+
+                <!-- Mot de passe -->
+                <fieldset class="name">
+                    <div class="body-title">Mot de passe <span class="tf-color-1">*</span></div>
+                    <input class="flex-grow"
+                           type="password"
+                           name="password"
+                           placeholder="Minimum 8 caractères"
+                           tabindex="0"
+                           required>
+                </fieldset>
+
+                <!-- Confirmation mot de passe (recommandé) -->
+                <fieldset class="name">
+                    <div class="body-title">Confirmer le mot de passe <span class="tf-color-1">*</span></div>
+                    <input class="flex-grow"
+                           type="password"
+                           name="password_confirmation"
+                           placeholder="Confirmez le mot de passe"
+                           tabindex="0"
+                           required>
+                </fieldset>
+
+                <!-- Optionnel : Avatar (si tu veux le permettre dès la création) -->
+                <!--
+                <fieldset>
+                    <div class="body-title">Photo de profil (optionnel)</div>
+                    <div class="upload-image flex-grow">
+                        <div class="item up-load">
+                            <label class="uploadfile" for="avatar">
+                                <span class="icon"><i class="icon-upload-cloud"></i></span>
+                                <span class="body-text">Sélectionner une image <span class="tf-color">cliquer ici</span></span>
+                                <input type="file" id="avatar" name="avatar" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+                -->
+
+                <!-- Boutons -->
+                <div class="bot d-flex justify-content-end gap10 mt-4">
+                    <a href="{{ route('admin.manage.managers') }}"
+                       class="tf-button style-2 w208">Annuler</a>
+                    <button type="submit" class="tf-button style-1 w208">
+                        Créer le gestionnaire
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
+</main>
 
+<style>
+    .form-style-1 .body-title {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #333;
+    }
+    .form-style-1 input {
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        padding: 0 16px;
+        font-size: 15px;
+    }
+    .form-style-1 input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        outline: none;
+    }
+    .tf-button.style-1 {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    .tf-button.style-2 {
+        background: #f1f5f9;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+    }
+    .wg-box {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+</style>
 @endsection

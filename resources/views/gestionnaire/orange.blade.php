@@ -1,113 +1,134 @@
-@extends('layouts.gestionnaire.master')
+@extends('layouts.gestionnairev2.master')
 
 @section('content')
-<main>
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-7">
-                <div class="card modern-card shadow-lg border-0">
-                    <div class="card-header-gradient">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <h4 class="mb-1 text-white fw-bold">
-                                    <i class='bx bx-money'></i> Analyse Transaction
-                                </h4>
-                                <p class="mb-0 text-white-50 small">Orange Money</p>
-                            </div>
-                            <div class="icon-container">
-                                <i class='bx bx-mobile-alt'></i>
-                            </div>
+<div class="main-content-inner">
+    <div class="main-content-wrap">
+
+        <!-- Header + Breadcrumbs -->
+        <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+            <h3>Analyser une Transaction Orange Money</h3>
+            <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+                <li>
+                    <a href="{{ route('gestionnaire.dashboard') }}">
+                        <div class="text-tiny">Dashboard</div>
+                    </a>
+                </li>
+                <li>
+                    <i class='bx bx-chevron-right'></i>
+                </li>
+                <li>
+                    <div class="text-tiny">Upload & Analyse</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="wg-box p-0 overflow-hidden">
+            <div class="card modern-card shadow-lg border-0 m-0 rounded-0">
+                <div class="card-header-gradient">
+                    <div class="d-flex align-items-center justify-content-between px-4 py-4">
+                        <div>
+                            <h4 class="mb-1 text-white fw-bold">
+                                <i class='bx bx-money me-2'></i> Analyse Transaction
+                            </h4>
+                            <p class="mb-0 text-white-50 small">Orange Money</p>
                         </div>
-                    </div>
-                    
-                    <div class="card-body p-4 p-md-5">
-                        <form method="POST" action="{{ route('manager.orange') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
-                            @csrf
-                            
-                            <div class="mb-4">
-                                <label for="image" class="form-label fw-bold text-dark mb-3">
-                                    <i class='bx bx-image-add me-2'></i>Upload Image Transaction
-                                </label>
-                                
-                                <div class="upload-container">
-                                    <input type="file" 
-                                           class="form-control form-control-lg file-input @error('image') is-invalid @enderror" 
-                                           id="image" 
-                                           name="image" 
-                                           accept="image/*" 
-                                           required>
-                                    
-                                    <div class="upload-placeholder" id="uploadPlaceholder">
-                                        <i class='bx bx-cloud-upload'></i>
-                                        <p class="mb-0">Cliquez ou glissez une image ici</p>
-                                        <small class="text-muted">JPEG, PNG, JPG (max 2MB)</small>
-                                    </div>
-                                    
-                                    <div class="image-preview" id="imagePreview" style="display: none;">
-                                        <img src="" alt="Preview" id="previewImg">
-                                        <button type="button" class="btn-remove" id="removeBtn">
-                                            <i class='bx bx-x'></i>
-                                        </button>
-                                    </div>
-                                    
-                                    @error('image')
-                                        <div class="invalid-feedback d-block">
-                                            <i class='bx bx-error-circle'></i> {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                
-                                <div class="form-text text-info mt-2">
-                                    <i class='bx bx-info-circle'></i> Formats acceptés : JPEG, PNG, JPG (max 2MB)
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-analyze btn-lg w-100">
-                                <i class='bx bx-search-alt-2 me-2'></i>
-                                <span>Analyser la Transaction</span>
-                                <i class='bx bx-right-arrow-alt ms-2'></i>
-                            </button>
-                        </form>
-
-                        @if (session('success'))
-                            <div class="alert alert-success-custom mt-4 fade-in">
-                                <i class='bx bx-check-circle me-2'></i>
-                                {{ session('success') }}
-                            </div>
-                        @endif
-
-                        @if (session('error'))
-                            <div class="alert alert-danger-custom mt-4 fade-in">
-                                <i class='bx bx-error-circle me-2'></i>
-                                {{ session('error') }}
-                            </div>
-                        @endif
+                        <div class="icon-container">
+                            <i class='bx bx-mobile-alt'></i>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Informations supplémentaires -->
-                <div class="info-cards mt-4">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="info-card">
-                                <i class='bx bx-shield-quarter'></i>
-                                <p>Sécurisé</p>
+
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ route('manager.orange') }}"
+                          enctype="multipart/form-data" class="needs-validation" novalidate>
+                        @csrf
+
+                        <div class="mb-4">
+                            <label for="image" class="form-label fw-bold text-dark mb-3">
+                                <i class='bx bx-image-add me-2'></i> Upload Image Transaction
+                            </label>
+
+                            <div class="upload-container">
+                                <input type="file"
+                                       class="form-control form-control-lg file-input @error('image') is-invalid @enderror"
+                                       id="image"
+                                       name="image"
+                                       accept="image/*"
+                                       required>
+
+                                <div class="upload-placeholder" id="uploadPlaceholder">
+                                    <i class='bx bx-cloud-upload'></i>
+                                    <p class="mb-0">Cliquez ou glissez une image ici</p>
+                                    <small class="text-muted">JPEG, PNG, JPG (max 2MB)</small>
+                                </div>
+
+                                <div class="image-preview" id="imagePreview" style="display: none;">
+                                    <img src="" alt="Preview" id="previewImg">
+                                    <button type="button" class="btn-remove" id="removeBtn">
+                                        <i class='bx bx-x'></i>
+                                    </button>
+                                </div>
+
+                                @error('image')
+                                    <div class="invalid-feedback d-block">
+                                        <i class='bx bx-error-circle'></i> {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="form-text text-info mt-2">
+                                <i class='bx bx-info-circle'></i> Formats acceptés : JPEG, PNG, JPG (max 2MB)
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="info-card">
-                                <i class='bx bx-timer'></i>
-                                <p>Rapide</p>
-                            </div>
+
+                        <button type="submit" class="btn btn-analyze btn-lg w-100">
+                            <i class='bx bx-search-alt-2 me-2'></i>
+                            <span>Analyser la Transaction</span>
+                            <i class='bx bx-right-arrow-alt ms-2'></i>
+                        </button>
+                    </form>
+
+                    @if (session('success'))
+                        <div class="alert alert-success-custom mt-4 fade-in">
+                            <i class='bx bx-check-circle me-2'></i>
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger-custom mt-4 fade-in">
+                            <i class='bx bx-error-circle me-2'></i>
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Informations supplémentaires -->
+            <div class="info-cards mt-4">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="info-card">
+                            <i class='bx bx-shield-quarter'></i>
+                            <p>Sécurisé</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-card">
+                            <i class='bx bx-timer'></i>
+                            <p>Rapide</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
 
-<!-- Styles personnalisés -->
+    </div>
+</div>
+
+
+<!-- Tous tes styles restent exactement les mêmes -->
 <style>
 /* Carte moderne */
 .modern-card {
@@ -349,20 +370,20 @@
     .card-header-gradient {
         padding: 1.5rem;
     }
-    
+
     .icon-container {
         width: 50px;
         height: 50px;
     }
-    
+
     .icon-container i {
         font-size: 1.5rem;
     }
-    
+
     .upload-placeholder i {
         font-size: 3rem;
     }
-    
+
     .btn-analyze {
         font-size: 0.95rem;
         padding: 0.875rem 1.5rem;
@@ -370,7 +391,7 @@
 }
 </style>
 
-<!-- Script pour la prévisualisation -->
+<!-- Script pour la prévisualisation (inchangé) -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('image');
@@ -378,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const imagePreview = document.getElementById('imagePreview');
     const previewImg = document.getElementById('previewImg');
     const removeBtn = document.getElementById('removeBtn');
-    
+
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -391,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
             reader.readAsDataURL(file);
         }
     });
-    
+
     removeBtn.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -403,6 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<!-- SweetAlert pour les résultats (inchangé) -->
 @if (session('transaction_data'))
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

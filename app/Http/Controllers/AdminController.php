@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\TransacOrange;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,10 +17,56 @@ class AdminController extends Controller
         $this->middleware('company_admin');
     }
 
-    public function dashboard()
+    /* public function dashboard()
     {
         return view('admin.dashboard');
-    }
+    } */
+public function dashboard()
+{
+    $companyId = auth()->user()->company_id;
+
+    // KPI Gestionnaires (inchangé)
+    $totalManagers    = User::where('role', 'gestionnaire')->where('company_id', $companyId)->count();
+    $activeManagers   = User::where('role', 'gestionnaire')->where('company_id', $companyId)->where('status', true)->count();
+    $inactiveManagers = $totalManagers - $activeManagers;
+
+    $recentManagers = User::where('role', 'gestionnaire')
+        ->where('company_id', $companyId)
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get(['id', 'name', 'email', 'status', 'created_at', 'avatar']);
+
+    // KPI Orange
+    $orangeQuery = TransacOrange::query()
+        ->join('users', 'transac_orange.user_id', '=', 'users.id')
+        ->where('users.company_id', $companyId);
+
+    $totalTransactionsOrange = (clone $orangeQuery)->count();
+
+    $todayTransactionsOrange = (clone $orangeQuery)
+        ->whereDate('transac_orange.date', today())
+        ->count();
+
+    // Montant → conversion explicite
+    $totalAmountOrange = (float) (clone $orangeQuery)->sum('transac_orange.montant');
+
+    $lastOrange = (clone $orangeQuery)
+        ->orderBy('transac_orange.date', 'desc')
+        ->first(['transac_orange.date', 'transac_orange.montant']);
+
+    $successfulOCR = (clone $orangeQuery)->whereNotNull('transac_orange.reference')->count();
+
+    $ocrSuccessRate = $totalTransactionsOrange > 0
+        ? round(($successfulOCR / $totalTransactionsOrange) * 100, 1)
+        : 0;
+
+    return view('admin.dashboard', compact(
+        'totalManagers', 'activeManagers', 'inactiveManagers', 'recentManagers',
+        'totalTransactionsOrange', 'todayTransactionsOrange',
+        'totalAmountOrange', 'lastOrange',
+        'ocrSuccessRate'
+    ));
+}
     public function showCreateManagerForm()
     {
         return view('admin.manager.create');
