@@ -1,48 +1,34 @@
 <!-- SIDEBAR -->
 <section id="sidebar">
     <a href="#" class="brand">
-        <i class='bx bxs-smile'></i>
-        <span class="text">AdminHub</span>
+<i class='bx bx-scan'></i>
+<span class="text">TransacExtract</span>
     </a>
     <ul class="side-menu top">
-        <li class="active">
+        <li class="{{ request()->routeIs('gestionnaire.dashboard') ? 'active' : '' }}">
             <a href="{{ route('gestionnaire.dashboard') }}">
                 <i class='bx bxs-dashboard'></i>
                 <span class="text">Dashboard</span>
             </a>
         </li>
-        <li>
-            <a href="{{ route('manager.orange') }}">
+
+        <li
+            class="{{ request()->routeIs('manager.orange.form') || request()->routeIs('manager.orange') ? 'active' : '' }}">
+            <a href="{{ route('manager.orange.form') }}">
                 <i class='bx bxs-cloud-upload'></i>
                 <span class="text">Upload Transactions</span>
             </a>
         </li>
-        <li>
+
+        <li class="{{ request()->routeIs('manager.orange.transactions') ? 'active' : '' }}">
             <a href="{{ route('manager.orange.transactions') }}">
                 <i class='bx bx-history'></i>
                 <span class="text">Transactions Orange</span>
             </a>
         </li>
-        <li>
-            <a href="#">
-                <i class='bx bxs-message-dots'></i>
-                <span class="text">Message</span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <i class='bx bxs-group'></i>
-                <span class="text">Team</span>
-            </a>
-        </li>
     </ul>
     <ul class="side-menu">
-        <li>
-            <a href="#">
-                <i class='bx bxs-cog'></i>
-                <span class="text">Settings</span>
-            </a>
-        </li>
+       
         <li>
             <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: inline;">
                 @csrf

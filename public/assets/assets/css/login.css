@@ -1,0 +1,123 @@
+
+.header-gradient {
+    background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+}
+
+.icon-box {
+    width: 80px;
+    height: 80px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.icon-main {
+    font-size: 36px;
+    background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.input-group-outline {
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease-in-out;
+    background: #f8f9fa;
+}
+
+.input-group-outline:focus-within {
+    border-color: #1a2a6c;
+    box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.1);
+    background: white;
+}
+
+.input-group-outline input {
+    border: none;
+    outline: none;
+    box-shadow: none !important;
+    background: transparent;
+}
+
+.input-group-text {
+    background: transparent !important;
+}
+
+.card {
+    overflow: hidden;
+    border-radius: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+    border: none;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(26, 42, 108, 0.3);
+}
+
+.fadeIn3 {
+    animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert {
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+}
+
+.alert .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+.security-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 0.5rem;
+    color: #495057;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.security-badge i {
+    color: #28a745;
+    font-size: 1rem;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.shadow-xl {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+}
+
+label {
+    margin-bottom: 0.5rem;
+}
+
+.form-control-lg {
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+}

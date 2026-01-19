@@ -39,4 +39,6 @@ Route::middleware(['auth', 'manager'])->group(function () {
     Route::post('/gestionnaire/orange', [ManagerController::class, 'orange'])->name('manager.orange'); // Route POST pour traiter l'upload
     // New route for listing transactions
     Route::get('/gestionnaire/orange/transactions', [ManagerController::class, 'listOrangeTransactions'])->name('manager.orange.transactions');
-});
+Route::get('/manager/dashboard/pdf', [ManagerController::class, 'dashboardPdf'])
+    ->name('manager.dashboard.pdf')
+    ->middleware(['auth', 'manager']);});

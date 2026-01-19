@@ -66,7 +66,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'avatar' => ['nullable', 'image', 'max:2048'], // Validation pour une image, max 2MB
+            'avatar' => ['nullable', 'image', 'max:5120'], // Max 5MB (5120 KB)
         ]);
     }
 
@@ -78,21 +78,32 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        // Créer l'entreprise
         $company = Companie::create([
             'name' => $data['company_name'],
             'email' => $data['company_email'],
-            'phone' => $data['company_phone'],
+            'phone' => $data['company_phone'] ?? null,
         ]);
 
-        $avatarPath = null;
-        if ($data['avatar']) {
+        // Gérer l'upload de l'avatar (optionnel)
+        $avatarPath = 'assets/avatars/default.png'; // Chemin par défaut
+
+        if (isset($data['avatar']) && $data['avatar']) {
             // Générer un nom unique pour l'image
-            $avatarName = time() . '_' . $data['avatar']->getClientOriginalName();
+            $avatarName = time() . '_' . uniqid() . '.' . $data['avatar']->getClientOriginalExtension();
+
+            // Créer le dossier s'il n'existe pas
+            $avatarDirectory = public_path('assets/avatars');
+            if (!file_exists($avatarDirectory)) {
+                mkdir($avatarDirectory, 0755, true);
+            }
+
             // Déplacer l'image vers public/assets/avatars
-            $data['avatar']->move(public_path('assets/avatars'), $avatarName);
-            $avatarPath = 'assets/avatars/' . $avatarName; // Chemin relatif pour stockage
+            $data['avatar']->move($avatarDirectory, $avatarName);
+            $avatarPath = 'assets/avatars/' . $avatarName;
         }
 
+        // Créer l'utilisateur admin
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -100,7 +111,7 @@ class RegisterController extends Controller
             'role' => 'admin',
             'status' => true,
             'company_id' => $company->id,
-            'avatar' => $avatarPath ?? 'assets/avatars/default.png', // Chemin par défaut si pas d'image
+            'avatar' => $avatarPath,
         ]);
 
         return $user;
@@ -117,5 +128,29 @@ class RegisterController extends Controller
     {
         $this->guard()->login($user); // Connecte l'utilisateur
         return redirect($this->redirectPath()); // Redirige selon le rôle
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function register(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        // Préparer les données avec le fichier avatar s'il existe
+        $data = $request->all();
+        if ($request->hasFile('avatar')) {
+            $data['avatar'] = $request->file('avatar');
+        }
+
+        $user = $this->create($data);
+
+        event(new \Illuminate\Auth\Events\Registered($user));
+
+        return $this->registered($request, $user)
+                        ?: redirect($this->redirectPath());
     }
 }

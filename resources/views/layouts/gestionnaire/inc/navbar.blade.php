@@ -1,5 +1,5 @@
 <!-- NAVBAR -->
-		<nav>
+		{{-- <nav>
 			<i class='bx bx-menu' ></i>
 			<a href="#" class="nav-link">Categories</a>
 			<form action="#">
@@ -17,5 +17,5 @@
 			<a href="#" class="profile">
 				<img src="img/people.png">
 			</a>
-		</nav>
+		</nav> --}}
 		<!-- NAVBAR -->
