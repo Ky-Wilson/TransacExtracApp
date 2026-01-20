@@ -99,7 +99,7 @@ public function dashboardPdf()
         return view('gestionnaire.orange');
     }
 
-    public function orange(Request $request)
+   /*  public function orange(Request $request)
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -164,7 +164,100 @@ public function dashboardPdf()
             $request->session()->flash('error', 'Erreur lors de l\'analyse de l\'image: ' . $e->getMessage());
             return redirect()->route('manager.orange.form');
         }
+    } */
+   public function orange(Request $request)
+{
+    $request->validate([
+        'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+    ], [
+        'images.*.required' => 'Veuillez sélectionner au moins une image.',
+        'images.*.max'      => 'Chaque image ne doit pas dépasser 2 Mo.',
+    ]);
+
+    $uploadedFiles = $request->file('images') ?? [];
+    $processedTransactions = [];
+    $errors = [];
+    $processedCount = 0;
+
+    DB::beginTransaction();
+
+    try {
+        foreach ($uploadedFiles as $index => $image) {
+            // Stocker temporairement
+            $path = $image->store('temp_ocr', 'public');
+            $fullPath = storage_path('app/public/' . $path);
+
+            try {
+                // OCR
+                $text = (new TesseractOCR($fullPath))->run();
+                $text = preg_replace('/\s+/', ' ', trim($text));
+                $text = strtolower($text);
+
+                // Extraction
+                $transactionData = $this->extractOrangeTransaction($text);
+
+                // Nettoyage fichier
+                Storage::disk('public')->delete($path);
+
+                if (!$transactionData['type']) {
+                    $errors[] = "Image " . ($index + 1) . " : type de transaction non reconnu.";
+                    continue;
+                }
+
+                // Vérification doublon (24h)
+                $existing = TransacOrange::where('user_id', auth()->id())
+                    ->where('type', $transactionData['type'])
+                    ->where('montant', $transactionData['montant'])
+                    ->where('reference', $transactionData['reference'])
+                    ->whereDate('created_at', '>=', now()->subHours(24))
+                    ->first();
+
+                if ($existing) {
+                    $errors[] = "Image " . ($index + 1) . " : transaction similaire déjà enregistrée (réf: {$transactionData['reference']}).";
+                    continue;
+                }
+
+                // Enregistrement
+                TransacOrange::create([
+                    'user_id'    => auth()->id(),
+                    'type'       => $transactionData['type'],
+                    'montant'    => $transactionData['montant'],
+                    'expediteur' => $transactionData['expediteur'],
+                    'reference'  => $transactionData['reference'],
+                    'solde'      => $transactionData['solde'],
+                    'frais'      => $transactionData['frais'],
+                    'date'       => $transactionData['date'],
+                    'raw_text'   => $text,
+                ]);
+
+                $processedTransactions[] = $transactionData;
+                $processedCount++;
+
+            } catch (\Exception $e) {
+                $errors[] = "Image " . ($index + 1) . " : erreur lors de l'analyse - " . $e->getMessage();
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        DB::commit();
+
+        if ($processedCount > 0) {
+            $request->session()->flash('transaction_results', $processedTransactions);
+            $request->session()->flash('success', "$processedCount transaction(s) analysée(s) et enregistrée(s) avec succès !");
+        }
+
+        if (!empty($errors)) {
+            $request->session()->flash('error', implode('<br>', $errors));
+        }
+
+        return redirect()->route('manager.orange.form');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        $request->session()->flash('error', 'Erreur globale lors du traitement : ' . $e->getMessage());
+        return redirect()->route('manager.orange.form');
     }
+}
 
     private function detectTransactionType($text)
     {
