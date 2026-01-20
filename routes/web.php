@@ -9,12 +9,6 @@ use App\Http\Controllers\OrangeController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\SuperAdminController;
 
-
-
-
-
-
-
 Route::get('/', function () {
     return view('auth.login');
 });

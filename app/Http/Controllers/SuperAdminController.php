@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\TransacMtn;
+use App\Models\TransacOrange;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SuperAdminController extends Controller
 {
@@ -16,9 +19,41 @@ class SuperAdminController extends Controller
     }
 
     public function dashboard()
-    {
-        return view('superadmin.dashboard');
-    }
+{
+    // Total admins (compagnies)
+    $totalAdmins = User::where('role', 'admin')->count();
+
+    // Total gestionnaires
+    $totalManagers = User::where('role', 'gestionnaire')->count();
+
+    // Gestionnaires actifs/inactifs
+    $activeManagers = User::where('role', 'gestionnaire')->where('status', true)->count();
+    $inactiveManagers = $totalManagers - $activeManagers;
+
+    // Transactions globales (toutes compagnies)
+    $totalTransactionsOrange = TransacOrange::count();
+    $totalTransactionsMtn     = TransacMtn::count();
+
+    $totalAmountOrange = (float) TransacOrange::sum('montant');
+    $totalAmountMtn    = (float) TransacMtn::sum('montant');
+    // Dernières transactions (exemple : 5 dernières combinées)
+    $recentTransactions = TransacOrange::select('id', 'date', 'montant', 'user_id', DB::raw("'Orange' as type"))
+        ->union(TransacMtn::select('id', 'date', 'montant', 'user_id', DB::raw("'MTN' as type")))
+        ->orderBy('date', 'desc')
+        ->take(5)
+        ->get();
+
+    // Taux OCR global Orange (exemple)
+    $successfulOCR = TransacOrange::whereNotNull('reference')->count();
+    $ocrSuccessRate = $totalTransactionsOrange > 0 ? round(($successfulOCR / $totalTransactionsOrange) * 100, 1) : 0;
+
+    return view('superadmin.dashboard', compact(
+        'totalAdmins', 'totalManagers', 'activeManagers', 'inactiveManagers',
+        'totalTransactionsOrange', 'totalTransactionsMtn',
+        'totalAmountOrange', 'totalAmountMtn',
+        'recentTransactions', 'ocrSuccessRate'
+    ));
+}
 
     public function manageManagers()
     {

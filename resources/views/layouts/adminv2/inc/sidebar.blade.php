@@ -23,42 +23,6 @@
         </div>
         <div class="center-item">
             <ul class="menu-list">
-                {{-- <li class="menu-item has-children">
-                    <a href="javascript:void(0);" class="menu-item-button">
-                        <div class="icon"><i class="icon-shopping-cart"></i></div>
-                        <div class="text">Products</div>
-                    </a>
-                    <ul class="sub-menu">
-                        <li class="sub-menu-item">
-                            <a href="{{ route('admin.create.manager.form') }}" class="">
-                                <div class="text">Créer un Gestionnaire</div>
-                            </a>
-                        </li>
-                        <li class="sub-menu-item">
-                            <a href="{{ route('admin.manage.managers') }}" class="">
-                                <div class="text">Liste des Gestionnaires</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="menu-item has-children">
-                    <a href="javascript:void(0);" class="menu-item-button">
-                        <div class="icon"><i class="icon-layers"></i></div>
-                        <div class="text">Transactions</div>
-                    </a>
-                    <ul class="sub-menu">
-                        <li class="sub-menu-item">
-                            <a href="{{ route('admin.transactions.orange') }}" class="">
-                                <div class="text">Liste des transactions Orange</div>
-                            </a>
-                        </li>
-                        <li class="sub-menu-item">
-                            <a href="{{ route('admin.transactions.mtn') }}" class="">
-                                <div class="text">Liste des transactions MTN</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li> --}}
                 <li class="menu-item has-children">
                     <a href="javascript:void(0);" class="menu-item-button">
                         <div class="icon"><i class="fa-solid fa-users"></i></div>
@@ -97,62 +61,6 @@
                             </a>
                         </li>
                     </ul>
-                </li>
-                <li class="menu-item has-children">
-                    <a href="javascript:void(0);" class="menu-item-button">
-                        <div class="icon"><i class="icon-layers"></i></div>
-                        <div class="text">Category</div>
-                    </a>
-                    <ul class="sub-menu">
-                        <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">New Category</div>
-                            </a>
-                        </li>
-                        <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">Categories</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="menu-item has-children">
-                    <a href="javascript:void(0);" class="menu-item-button">
-                        <div class="icon"><i class="icon-file-plus"></i></div>
-                        <div class="text">Order</div>
-                    </a>
-                    <ul class="sub-menu">
-                        <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">Orders</div>
-                            </a>
-                        </li>
-                        <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">Order tracking</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="">
-                        <div class="icon"><i class="icon-image"></i></div>
-                        <div class="text">Slider</div>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" class="">
-                        <div class="icon"><i class="icon-grid"></i></div>
-                        <div class="text">Coupns</div>
-                    </a>
-                </li>
-
-                <li class="menu-item">
-                    <a href="#" class="">
-                        <div class="icon"><i class="icon-user"></i></div>
-                        <div class="text">User</div>
-                    </a>
                 </li>
 
                 <li class="menu-item">

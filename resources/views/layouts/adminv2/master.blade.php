@@ -42,9 +42,9 @@
                         {{-- @include('layouts.gestionnairev2.inc.sidebar') --}}
 
                         @yield('content')
-                        <div class="bottom-page">
+                        {{-- <div class="bottom-page">
                             <div class="body-text">Copyright © 2024 SurfsideMedia</div>
-                        </div>
+                        </div> --}}
                     </div>
 
                 </div>
