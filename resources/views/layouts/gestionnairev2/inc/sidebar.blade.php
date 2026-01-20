@@ -44,17 +44,17 @@
                 <li class="menu-item has-children">
                     <a href="javascript:void(0);" class="menu-item-button">
                         <div class="icon"><i class="icon-layers"></i></div>
-                        <div class="text">Brand</div>
+                        <div class="text">MTN</div>
                     </a>
                     <ul class="sub-menu">
                         <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">New Brand</div>
+                            <a href="{{ route('manager.mtn.form') }}" class="">
+                                <div class="text">Upload Transactions MTN</div>
                             </a>
                         </li>
                         <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">Brands</div>
+                            <a href="{{ route('manager.mtn.transactions') }}" class="">
+                                <div class="text">Transactions MTN</div>
                             </a>
                         </li>
                     </ul>

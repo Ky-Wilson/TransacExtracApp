@@ -20,7 +20,6 @@ class CreateTransacOrangeTable extends Migration
             $table->dateTime('date')->nullable(); // Date et heure de la transaction
             $table->text('raw_text')->nullable(); // Texte brut extrait pour référence
             $table->timestamps();
-
             // Clé étrangère vers la table users
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 

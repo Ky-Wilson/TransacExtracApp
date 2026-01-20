@@ -11,8 +11,8 @@
     Authentication - TransacExtraction Dashboard
   </title>
    <!-- CSS Files -->
-  <link id="pagestyle" href="{{ asset('assetsv2/assets/css/material-dashboard.css?v=3.2.0') }}" rel="stylesheet" />
-  <link href="{{ asset('assetsv2/assets/css/register.css') }}" rel="stylesheet" />
+  <link id="pagestyle" href="{{ asset('assets/assets/css/material-dashboard.css?v=3.2.0') }}" rel="stylesheet" />
+  <link href="{{ asset('assets/assets/css/register.css') }}" rel="stylesheet" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 

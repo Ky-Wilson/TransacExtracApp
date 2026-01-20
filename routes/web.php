@@ -1,11 +1,14 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ManagerController;
-use App\Http\Controllers\SuperAdminController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MtnController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\OrangeController;
+use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\SuperAdminController;
+
 
 
 
@@ -25,20 +28,32 @@ Route::middleware(['auth', 'super_admin'])->group(function () {
 });
 
 Route::middleware(['auth', 'company_admin'])->group(function () {
-
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/create-manager', [AdminController::class, 'showCreateManagerForm'])->name('admin.create.manager.form');
     Route::post('/admin/create-manager', [AdminController::class, 'createManager'])->name('admin.create.manager');
     Route::get('/admin/manage-managers', [AdminController::class, 'manageManagers'])->name('admin.manage.managers');
-Route::put('/admin/manage-managers/{manager}/status', [AdminController::class, 'updateManagerStatus'])->name('admin.update.manager.status');
+    Route::put('/admin/manage-managers/{manager}/status', [AdminController::class, 'updateManagerStatus'])->name('admin.update.manager.status');
 });
 
+
 Route::middleware(['auth', 'manager'])->group(function () {
+
     Route::get('/gestionnaire/dashboard', [ManagerController::class, 'dashboard'])->name('gestionnaire.dashboard');
-    Route::get('/gestionnaire/orange', [ManagerController::class, 'showOrangeForm'])->name('manager.orange.form'); // Nouvelle route GET pour afficher la vue
-    Route::post('/gestionnaire/orange', [ManagerController::class, 'orange'])->name('manager.orange'); // Route POST pour traiter l'upload
-    // New route for listing transactions
+    Route::get('/manager/dashboard/pdf', [ManagerController::class, 'dashboardPdf'])->name('manager.dashboard.pdf');
+
+
+    // Routes Orange Money
+    /* Route::get('/gestionnaire/orange', [ManagerController::class, 'showOrangeForm'])->name('manager.orange.form');
+    Route::post('/gestionnaire/orange', [ManagerController::class, 'orange'])->name('manager.orange');
     Route::get('/gestionnaire/orange/transactions', [ManagerController::class, 'listOrangeTransactions'])->name('manager.orange.transactions');
-Route::get('/manager/dashboard/pdf', [ManagerController::class, 'dashboardPdf'])
-    ->name('manager.dashboard.pdf')
-    ->middleware(['auth', 'manager']);});
+ */
+    Route::get('/gestionnaire/orange', [OrangeController::class, 'showOrangeForm'])->name('manager.orange.form');
+    Route::post('/gestionnaire/orange', [OrangeController::class, 'orange'])->name('manager.orange');
+    Route::get('/gestionnaire/orange/transactions', [OrangeController::class, 'listOrangeTransactions'])->name('manager.orange.transactions');
+
+    // Routes MTN Money
+    Route::get('/gestionnaire/mtn', [MtnController::class, 'showMtnForm'])->name('manager.mtn.form');
+    Route::post('/gestionnaire/mtn', [MtnController::class, 'mtn'])->name('manager.mtn');
+    Route::get('/gestionnaire/mtn/transactions', [MtnController::class, 'listMtnTransactions'])->name('manager.mtn.transactions');
+
+});
