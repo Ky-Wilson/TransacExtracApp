@@ -10,6 +10,10 @@ class TransacOrange extends Model
     protected $fillable = [
         'user_id', 'type', 'montant', 'expediteur', 'reference', 'solde', 'frais', 'date', 'raw_text'
     ];
+    protected $casts = [
+    'date'    => 'datetime',
+    'montant' => 'float',     // ← ajoutez ceci
+];
 
     public function user()
     {

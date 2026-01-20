@@ -18,56 +18,56 @@ class AdminController extends Controller
         $this->middleware('company_admin');
     }
 
-// public function dashboard()
-// {
-//     $companyId = auth()->user()->company_id;
+    // public function dashboard()
+    // {
+    //     $companyId = auth()->user()->company_id;
 
-//     // KPI Gestionnaires (inchangé)
-//     $totalManagers    = User::where('role', 'gestionnaire')->where('company_id', $companyId)->count();
-//     $activeManagers   = User::where('role', 'gestionnaire')->where('company_id', $companyId)->where('status', true)->count();
-//     $inactiveManagers = $totalManagers - $activeManagers;
+    //     // KPI Gestionnaires (inchangé)
+    //     $totalManagers    = User::where('role', 'gestionnaire')->where('company_id', $companyId)->count();
+    //     $activeManagers   = User::where('role', 'gestionnaire')->where('company_id', $companyId)->where('status', true)->count();
+    //     $inactiveManagers = $totalManagers - $activeManagers;
 
-//     $recentManagers = User::where('role', 'gestionnaire')
-//         ->where('company_id', $companyId)
-//         ->orderBy('created_at', 'desc')
-//         ->take(5)
-//         ->get(['id', 'name', 'email', 'status', 'created_at', 'avatar']);
+    //     $recentManagers = User::where('role', 'gestionnaire')
+    //         ->where('company_id', $companyId)
+    //         ->orderBy('created_at', 'desc')
+    //         ->take(5)
+    //         ->get(['id', 'name', 'email', 'status', 'created_at', 'avatar']);
 
-//     // KPI Orange
-//     $orangeQuery = TransacOrange::query()
-//         ->join('users', 'transac_orange.user_id', '=', 'users.id')
-//         ->where('users.company_id', $companyId);
+    //     // KPI Orange
+    //     $orangeQuery = TransacOrange::query()
+    //         ->join('users', 'transac_orange.user_id', '=', 'users.id')
+    //         ->where('users.company_id', $companyId);
 
-//     $totalTransactionsOrange = (clone $orangeQuery)->count();
+    //     $totalTransactionsOrange = (clone $orangeQuery)->count();
 
-//     $todayTransactionsOrange = (clone $orangeQuery)
-//         ->whereDate('transac_orange.date', today())
-//         ->count();
+    //     $todayTransactionsOrange = (clone $orangeQuery)
+    //         ->whereDate('transac_orange.date', today())
+    //         ->count();
 
-//     // Montant → conversion explicite
-//     $totalAmountOrange = (float) (clone $orangeQuery)->sum('transac_orange.montant');
+    //     // Montant → conversion explicite
+    //     $totalAmountOrange = (float) (clone $orangeQuery)->sum('transac_orange.montant');
 
-//     $lastOrange = (clone $orangeQuery)
-//         ->orderBy('transac_orange.date', 'desc')
-//         ->first(['transac_orange.date', 'transac_orange.montant']);
+    //     $lastOrange = (clone $orangeQuery)
+    //         ->orderBy('transac_orange.date', 'desc')
+    //         ->first(['transac_orange.date', 'transac_orange.montant']);
 
-//     $successfulOCR = (clone $orangeQuery)->whereNotNull('transac_orange.reference')->count();
+    //     $successfulOCR = (clone $orangeQuery)->whereNotNull('transac_orange.reference')->count();
 
-//     $ocrSuccessRate = $totalTransactionsOrange > 0
-//         ? round(($successfulOCR / $totalTransactionsOrange) * 100, 1)
-//         : 0;
+    //     $ocrSuccessRate = $totalTransactionsOrange > 0
+    //         ? round(($successfulOCR / $totalTransactionsOrange) * 100, 1)
+    //         : 0;
 
-//     return view('admin.dashboard', compact(
-//         'totalManagers', 'activeManagers', 'inactiveManagers', 'recentManagers',
-//         'totalTransactionsOrange', 'todayTransactionsOrange',
-//         'totalAmountOrange', 'lastOrange',
-//         'ocrSuccessRate'
-//     ));
-// }
+    //     return view('admin.dashboard', compact(
+    //         'totalManagers', 'activeManagers', 'inactiveManagers', 'recentManagers',
+    //         'totalTransactionsOrange', 'todayTransactionsOrange',
+    //         'totalAmountOrange', 'lastOrange',
+    //         'ocrSuccessRate'
+    //     ));
+    // }
 
 
 
-public function dashboard()
+    public function dashboard()
     {
         $companyId = auth()->user()->company_id;
 
@@ -123,20 +123,27 @@ public function dashboard()
             ->first(['transac_mtn.date', 'transac_mtn.montant']);
 
         return view('admin.dashboard', compact(
-            'totalManagers', 'activeManagers', 'inactiveManagers', 'recentManagers',
-            'totalTransactionsOrange', 'todayTransactionsOrange',
-            'totalAmountOrange', 'lastOrange',
+            'totalManagers',
+            'activeManagers',
+            'inactiveManagers',
+            'recentManagers',
+            'totalTransactionsOrange',
+            'todayTransactionsOrange',
+            'totalAmountOrange',
+            'lastOrange',
             'ocrSuccessRate',
-            'totalTransactionsMtn', 'todayTransactionsMtn',
-            'totalAmountMtn', 'lastMtn'
+            'totalTransactionsMtn',
+            'todayTransactionsMtn',
+            'totalAmountMtn',
+            'lastMtn'
         ));
     }
 
     public function showCreateManagerForm()
-        {
-            return view('admin.manager.create');
-        }
-   public function createManager(Request $request)
+    {
+        return view('admin.manager.create');
+    }
+    public function createManager(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -167,23 +174,73 @@ public function dashboard()
     public function manageManagers()
     {
         $managers = User::where('role', 'gestionnaire')
-                        ->where('company_id', auth()->user()->company_id)
-                        ->paginate(5); // 5 éléments par page
+            ->where('company_id', auth()->user()->company_id)
+            ->paginate(5); // 5 éléments par page
 
         return view('admin.manager.list', compact('managers'));
     }
-public function updateManagerStatus(Request $request, User $manager)
-{
-    $request->validate([
-        'status' => 'required|boolean',
-    ]);
+    public function updateManagerStatus(Request $request, User $manager)
+    {
+        $request->validate([
+            'status' => 'required|boolean',
+        ]);
 
-    $manager->update(['status' => $request->status]);
+        $manager->update(['status' => $request->status]);
 
-    // Return JSON response instead of redirect
-    return response()->json([
-        'success' => true,
-        'message' => 'Statut du gestionnaire mis à jour avec succès.'
-    ]);
-}
+        // Return JSON response instead of redirect
+        return response()->json([
+            'success' => true,
+            'message' => 'Statut du gestionnaire mis à jour avec succès.'
+        ]);
+    }
+
+    public function transactionsOrange(Request $request)
+    {
+        $companyId = auth()->user()->company_id;
+
+        $query = TransacOrange::query()
+            ->join('users', 'transac_orange.user_id', '=', 'users.id')
+            ->where('users.company_id', $companyId)
+            ->select('transac_orange.*', 'users.name as gestionnaire_name');
+
+        if ($request->filled('gestionnaire')) {
+            $query->where('transac_orange.user_id', $request->gestionnaire);
+        }
+
+        $transactions = $query->orderBy('transac_orange.date', 'desc')
+            ->paginate(15)
+            ->appends($request->query()); // Garde le filtre dans les liens de pagination
+
+        $gestionnaires = User::where('role', 'gestionnaire')
+            ->where('company_id', $companyId)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('admin.transactions.orange', compact('transactions', 'gestionnaires'));
+    }
+
+    public function transactionsMtn(Request $request)
+    {
+        $companyId = auth()->user()->company_id;
+
+        $query = TransacMtn::query()
+            ->join('users', 'transac_mtn.user_id', '=', 'users.id')
+            ->where('users.company_id', $companyId)
+            ->select('transac_mtn.*', 'users.name as gestionnaire_name');
+
+        if ($request->filled('gestionnaire')) {
+            $query->where('transac_mtn.user_id', $request->gestionnaire);
+        }
+
+        $transactions = $query->orderBy('transac_mtn.date', 'desc')
+            ->paginate(15)
+            ->appends($request->query());
+
+        $gestionnaires = User::where('role', 'gestionnaire')
+            ->where('company_id', $companyId)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('admin.transactions.mtn', compact('transactions', 'gestionnaires'));
+    }
 }

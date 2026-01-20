@@ -20,6 +20,10 @@ class TransacMtn extends Model
         'date',
         'raw_text',
     ];
+    protected $casts = [
+    'date'    => 'datetime',
+    'montant' => 'float',     // ← ajoutez ceci
+];
 
     public function user()
     {

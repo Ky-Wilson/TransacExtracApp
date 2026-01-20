@@ -23,7 +23,7 @@
         </div>
         <div class="center-item">
             <ul class="menu-list">
-                <li class="menu-item has-children">
+                {{-- <li class="menu-item has-children">
                     <a href="javascript:void(0);" class="menu-item-button">
                         <div class="icon"><i class="icon-shopping-cart"></i></div>
                         <div class="text">Products</div>
@@ -44,17 +44,56 @@
                 <li class="menu-item has-children">
                     <a href="javascript:void(0);" class="menu-item-button">
                         <div class="icon"><i class="icon-layers"></i></div>
-                        <div class="text">Brand</div>
+                        <div class="text">Transactions</div>
                     </a>
                     <ul class="sub-menu">
                         <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">New Brand</div>
+                            <a href="{{ route('admin.transactions.orange') }}" class="">
+                                <div class="text">Liste des transactions Orange</div>
                             </a>
                         </li>
                         <li class="sub-menu-item">
-                            <a href="#" class="">
-                                <div class="text">Brands</div>
+                            <a href="{{ route('admin.transactions.mtn') }}" class="">
+                                <div class="text">Liste des transactions MTN</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li> --}}
+                <li class="menu-item has-children">
+                    <a href="javascript:void(0);" class="menu-item-button">
+                        <div class="icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="text">Gestionnaires</div>
+                    </a>
+                    <ul class="sub-menu">
+                        <li class="sub-menu-item">
+                            <a href="{{ route('admin.create.manager.form') }}">
+                                <div class="text">Créer un Gestionnaire</div>
+                            </a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="{{ route('admin.manage.managers') }}">
+                                <div class="text">Liste des Gestionnaires</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="menu-item has-children">
+                    <a href="javascript:void(0);" class="menu-item-button">
+                        <div class="icon"><i class="fa-solid fa-money-bill-transfer"></i></div>
+                        <div class="text">Transactions</div>
+                    </a>
+                    <ul class="sub-menu">
+                        <li class="sub-menu-item">
+                            <a href="{{ route('admin.transactions.orange') }}">
+                                <div class="icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                                <div class="text">Transactions Orange</div>
+                            </a>
+                        </li>
+                        <li class="sub-menu-item">
+                            <a href="{{ route('admin.transactions.mtn') }}">
+                                <div class="icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                                <div class="text">Transactions MTN</div>
                             </a>
                         </li>
                     </ul>
@@ -117,43 +156,43 @@
                 </li>
 
                 <li class="menu-item">
-    <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: none;">
-        @csrf
-        @method('POST') <!-- optionnel mais explicite -->
-    </form>
+                    <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: none;">
+                        @csrf
+                        @method('POST') <!-- optionnel mais explicite -->
+                    </form>
 
-    <a href="#" class="logout d-flex align-items-center">
-        <i class='bx bxs-log-out-circle'></i>
-        <span class="text ms-2">Déconnexion</span>
-    </a>
-</li>
+                    <a href="#" class="logout d-flex align-items-center">
+                        <i class='bx bxs-log-out-circle'></i>
+                        <span class="text ms-2">Déconnexion</span>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const logoutLink = document.querySelector('.logout');
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutLink = document.querySelector('.logout');
 
-    if (logoutLink) {
-        logoutLink.addEventListener('click', function (e) {
-            e.preventDefault();
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function(e) {
+                e.preventDefault();
 
-            Swal.fire({
-                title: 'Déconnexion',
-                text: 'Voulez-vous vraiment vous déconnecter ?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Oui, déconnecter',
-                cancelButtonText: 'Annuler'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('logout-form').submit();
-                }
+                Swal.fire({
+                    title: 'Déconnexion',
+                    text: 'Voulez-vous vraiment vous déconnecter ?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Oui, déconnecter',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('logout-form').submit();
+                    }
+                });
             });
-        });
-    }
-});
+        }
+    });
 </script>

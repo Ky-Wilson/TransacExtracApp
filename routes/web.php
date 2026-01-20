@@ -33,6 +33,9 @@ Route::middleware(['auth', 'company_admin'])->group(function () {
     Route::post('/admin/create-manager', [AdminController::class, 'createManager'])->name('admin.create.manager');
     Route::get('/admin/manage-managers', [AdminController::class, 'manageManagers'])->name('admin.manage.managers');
     Route::put('/admin/manage-managers/{manager}/status', [AdminController::class, 'updateManagerStatus'])->name('admin.update.manager.status');
+
+    Route::get('/admin/transactions/orange', [AdminController::class, 'transactionsOrange'])->name('admin.transactions.orange');
+    Route::get('/admin/transactions/mtn', [AdminController::class, 'transactionsMtn'])->name('admin.transactions.mtn');
 });
 
 
@@ -43,10 +46,6 @@ Route::middleware(['auth', 'manager'])->group(function () {
 
 
     // Routes Orange Money
-    /* Route::get('/gestionnaire/orange', [ManagerController::class, 'showOrangeForm'])->name('manager.orange.form');
-    Route::post('/gestionnaire/orange', [ManagerController::class, 'orange'])->name('manager.orange');
-    Route::get('/gestionnaire/orange/transactions', [ManagerController::class, 'listOrangeTransactions'])->name('manager.orange.transactions');
- */
     Route::get('/gestionnaire/orange', [OrangeController::class, 'showOrangeForm'])->name('manager.orange.form');
     Route::post('/gestionnaire/orange', [OrangeController::class, 'orange'])->name('manager.orange');
     Route::get('/gestionnaire/orange/transactions', [OrangeController::class, 'listOrangeTransactions'])->name('manager.orange.transactions');
