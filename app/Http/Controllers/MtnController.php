@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use thiagoalessio\TesseractOCR\TesseractOCR;
+use Carbon\Carbon;
 
 class MtnController extends Controller
 {
@@ -70,6 +71,16 @@ class MtnController extends Controller
                         continue;
                     }
 
+                    // Date : on force nullable si invalide
+                    $date = null;
+                    if (!empty($transactionData['date'])) {
+                        try {
+                            $date = Carbon::parse($transactionData['date']);
+                        } catch (\Exception $e) {
+                            $errors[] = "Image " . ($index + 1) . " : date invalide ignorée (" . $transactionData['date'] . ").";
+                        }
+                    }
+
                     TransacMtn::create([
                         'user_id'    => auth()->id(),
                         'type'       => $transactionData['type'],
@@ -78,7 +89,7 @@ class MtnController extends Controller
                         'reference'  => $transactionData['reference'],
                         'solde'      => $transactionData['solde'],
                         'frais'      => $transactionData['frais'],
-                        'date'       => $transactionData['date'],
+                        'date'       => $date,
                         'raw_text'   => $text,
                     ]);
 
@@ -123,7 +134,7 @@ class MtnController extends Controller
             'date'       => null
         ];
 
-        // Détection du type
+        // Détection du type (plus robuste)
         if (stripos($text, 'transfere') !== false || stripos($text, 'vous avez transfere') !== false) {
             $data['type'] = 'transfere';
         } elseif (stripos($text, 'recu') !== false || stripos($text, 'vous avez recu') !== false) {
@@ -141,7 +152,7 @@ class MtnController extends Controller
             $data['montant'] = $m[1] . ' FCFA';
         }
 
-        // Expéditeur / Destinataire
+        // Expéditeur (225 + 8 chiffres)
         if (preg_match('/(?:au|sur votre compte)\s*(225\d{8})/i', $text, $m)) {
             $data['expediteur'] = $m[1];
         }
@@ -158,14 +169,23 @@ class MtnController extends Controller
             $data['solde'] = $m[2] . ' FCFA';
         }
 
-        // Frais (seulement retrait)
+        // Frais (retrait)
         if ($data['type'] === 'retrait' && preg_match('/frais\s*:\s*(\d{1,})\s*fcfa/i', $text, $m)) {
             $data['frais'] = $m[1] . ' FCFA';
         }
 
-        // Date
+        // Date - Version corrigée et robuste
         if (preg_match('/(\d{2})-(\d{2})-(\d{4})\s*(\d{2}):(\d{2}):(\d{2})/', $text, $m)) {
-            $data['date'] = "20{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:{$m[6]}";
+            $year = $m[3];
+            // Protection contre les années invalides (ex: 202025 → on limite à 20xx)
+            if ($year >= 2000 && $year <= date('Y') + 1) {
+                $data['date'] = "{$year}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:{$m[6]}";
+            }
+        } elseif (preg_match('/(\d{2})[\/-](\d{2})[\/-](\d{4})\s*(\d{2}):(\d{2})/', $text, $m)) {
+            $year = $m[3];
+            if ($year >= 2000 && $year <= date('Y') + 1) {
+                $data['date'] = "{$year}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:00";
+            }
         }
 
         return $data;
